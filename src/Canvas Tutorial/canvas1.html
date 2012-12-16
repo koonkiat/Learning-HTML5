@@ -1,0 +1,28 @@
+<html>
+<body>
+<canvas id="myCanvas" width="1024" height="768">your browser does not support the canvas tag </canvas>
+
+<script type="text/javascript">
+var MAXPX = 50;
+var MINPX = 12;
+var canvas=document.getElementById('myCanvas');
+var ctx=canvas.getContext('2d');
+var t = "Hello me";
+//ctx.font = "bold 12px san-serif";
+ctx.strokeStyle='#FF0000';
+ctx.textBaseline = "top";
+var offset = 0;
+for(var i = 0; i < 10; ++i)
+{
+    var fontSize = (MINPX+10*i);
+    ctx.font = "bold "+fontSize+"px san-serif";
+	var outText = "text: "+fontSize+" offset:"+offset;
+    ctx.fillText(outText, 0, offset);
+    var textMet = ctx.measureText(outText);
+
+    ctx.strokeRect(0,offset,textMet.width,fontSize);
+    offset += fontSize;
+}
+</script>
+</body>
+</html>

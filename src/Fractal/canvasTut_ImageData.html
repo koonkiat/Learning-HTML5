@@ -1,0 +1,52 @@
+<html>
+<head>
+<script type="text/javascript">
+
+// DEBUG CODE START
+function trace(str, clear){
+    if(clear)
+        ta.value = "";
+    
+    ta.value += str +"\n";
+}
+// DEBUG CODE END
+function init() {
+    trace("init");
+    var drawingCanvas = document.getElementById('myDrawing');
+    if(drawingCanvas.getContext) {
+        trace("has context");
+        // Initaliase a 2-dimensional drawing context
+        var context = drawingCanvas.getContext('2d');
+        var width = drawingCanvas.width;
+        var height = drawingCanvas.height;
+        var imageData = context.createImageData(width, height);
+        var pixels = imageData.data;
+        
+        var pixelCount = pixels.length / 4;
+        trace("pixels len "+pixels.length + " pixelCount "+pixelCount);
+        for(var i = 0; i < pixels.length; i+=4) {
+            pixels[i+0] = 190;
+            pixels[i+1] = 210;
+            pixels[i+2] = 255;
+            pixels[i+3] = (i%10 != 0)?255:200;
+//            trace("i "+i);
+        }
+        context.putImageData(imageData, 0, 0);
+    }
+    else {
+        trace("canvas not found");
+    }
+}
+
+</script>
+</head>
+<body>
+<canvas id="myDrawing" width="60" height="60">
+<p>Your browser doesn't support canvas.</p>
+<a href="http://www.google.com/chrome"> Click here to download Google Chrome</a>
+</canvas>
+<p>
+<textarea id="ta" rows='50' cols='100'/></textarea>
+<script type="text/javascript">init()</script>
+</body>
+</html>

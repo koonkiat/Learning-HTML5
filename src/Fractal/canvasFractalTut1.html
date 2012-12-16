@@ -1,0 +1,149 @@
+<html>
+<head>
+<script type="text/javascript">
+
+// DEBUG CODE START
+function trace(str, clear){
+    if(clear)
+        ta.value = "";
+    
+    ta.value += str +"\n";
+}
+// DEBUG CODE END
+function FillAndStroke(context, fillStyle, strokeStyle) {
+    if(strokeStyle != undefined) {
+        context.strokeStyle = strokeStyle;
+        context.stroke();
+    }
+    
+    if(fillStyle != undefined) {
+        context.fillStyle = fillStyle;
+        context.fill();
+    }
+}
+function DrawRect(context, x, y, w, h, fillStyle, strokeStyle) {
+    if(fillStyle) {
+        context.fillStyle = fillStyle;
+        context.fillRect(x,y,w,h);
+    }
+    if(strokeStyle) {
+        context.strokeStyle = strokeStyle;
+        context.strokeRect(x,y,w,h);
+    }
+}
+
+function DrawPx(context, x, y, colour) {
+    //trace("colour "+colour)
+    var pxSize = 2;
+    DrawRect(context, x, y, pxSize, pxSize, colour);
+}
+function DrawArc(context, x, y, radius, startAngle, endAngle, isAnticlockwise, fillStyle, strokeStyle) {
+    context.beginPath();
+    context.arc(x,y,radius, startAngle, endAngle, isAnticlockwise);
+    context.closePath();
+    
+    FillAndStroke(context, fillStyle, strokeStyle);
+}
+function init() {
+    trace("init");
+    var drawingCanvas = document.getElementById('myDrawing');
+    if(drawingCanvas.getContext) {
+        // Initaliase a 2-dimensional drawing context
+        var context = drawingCanvas.getContext('2d');
+
+//        DrawRect(context, 20, 20, 200, 200, "#099000", '#880088');
+        
+//        DrawArc(context, 10, 10, 1, 0, Math.PI*2, true, "#FFCC00", "#000000");
+
+//          DrawArc(context, 50, 50, 40, 90/180*Math.PI, Math.PI*2, true, "#FFCC00", "#000000");
+//          DrawArc(context, 50, 50, 40, 0, Math.PI/2, false, "#FFCC00", "#000000");
+
+        // reference: http://cs.lmu.edu/~ray/notes/ifs/
+        var cA = 
+        [
+        /*
+        // Koch Curve
+        0.333, 0, 0, 0, 0.333, 0,
+        0.167, -0.289, 0.333, 0.289, 0.167, 0,
+        0.167, 0.289, 0.5, -0.289, 0.167, 0.289,
+        0.333, 0, 0.677, 0, 0.333, 0
+        
+        0.3333,   0.0000,   0.0000,   0.0000,  0.3333,   0.0000,
+        0.1667,  -0.2887,   0.3333,   0.2887,   0.1667,    0.0000,   
+        0.1667,   0.2887,   0.5000,  -0.2887,   0.1667,   0.2887,   
+        0.3333,   0.0000,   0.6667,  0.0000,   0.3333,   0.0000   
+        
+        // Sierpinski's Gasket
+        0.5, 0, 0,      0, 0.5,   0,
+        0.5, 0, 0.50,   0, 0.5,   0,
+        0.5, 0, 0.25,   0, 0.5,   0.433 
+        
+        
+        // Barnsley Fern - needs a lot of points
+         0.00,   0.00, 0.0,   0.00,  0.16,  0.00,
+         0.85,   0.04, 0.0,  -0.04,  0.85,  1.60,
+         0.20,  -0.26, 0.0,   0.23,  0.22,  1.60,
+        -0.15,   0.28, 0.0,   0.26,  0.24,  0.44 
+        */
+        
+        0.3333,   0.0000,   0.0000,   0.0000,   0.3333,   0.0000,
+        0.1667,  -0.2887,   0.3333,   0.2887,   0.1667,   0.0000,   
+        0.1667,   0.2887,   0.5000,  -0.2887,   0.1667,   0.2887,   
+        0.3333,   0.0000,   0.6667,   0.0000,   0.3333,   0.0000
+        ];
+        var scale = 400;
+        var oldX = scale;
+        var oldY = scale;
+        var rowCount = (cA.length+1)/6 - 1;
+        
+        // duplicating the data (doubling the array size with duplicated data improves the visual result)
+        // this increases the data set and reduce the chance of overdraw - improves frequency distribution
+        // UPDATE: only works for large pixels
+//        cA = cA.concat(cA);
+
+//        trace('ca len '+cA.length)
+            
+        for(var i = 0; i < 10000; ++i) {
+            if(i < 20)
+                continue;
+            
+            var id = Math.floor(Math.random()*rowCount) * 6;
+
+/*            var x =   cA[id + 0] * oldX 
+                    + cA[id + 1] * oldY
+                    + cA[id + 2] * scale;
+            var y =   cA[id + 3] * oldX 
+                    + cA[id + 4] * oldY
+                    + cA[id + 5] * scale;*/
+            var x =   cA[id + 0] * oldX 
+                    + cA[id + 1] * oldY
+                    + cA[id + 2] * scale;
+            var y =   cA[id + 3] * oldX 
+                    + cA[id + 4] * oldY
+                    + cA[id + 5] * scale;
+            DrawPx(context, x, y, '0000FF');
+            oldX = Math.floor(x);
+            oldY = Math.floor(y);
+//            trace(x +',    '+y);
+        }
+        
+            
+        trace('0xFF00FF to string '+0xFF00FF.toString())
+    }
+    else {
+        trace("canvas not found");
+    }
+}
+
+</script>
+</head>
+<body>
+<canvas id="myDrawing" width="600" height="600">
+<p>Your browser doesn't support canvas.</p>
+<a href="http://www.google.com/chrome"> Click here to download Google Chrome</a>
+</canvas>
+
+<textarea id="ta" rows='50' cols='100'/></textarea>
+<script type="text/javascript">init()</script>
+</body>
+</html>

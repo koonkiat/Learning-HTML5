@@ -1,0 +1,177 @@
+<html>
+<head>
+<script type="text/javascript">
+var globalData = new Object();
+var PX_PER_FRAME = 1000;
+var FRACTAL_CANVAS = "f_canvas";
+var CANVAS_W = 400;
+var CANVAS_H = 400;
+
+function localTrace(text, isAppend)
+{
+    var ta = document.getElementById("TA");
+    if(isAppend)
+    {
+        ta.value += "\n"+text;
+    }
+    else
+    {
+        ta.value = text;
+    }
+}
+function onEnterFrame()
+{
+    var ms = new Date().getTime();
+    drawFractal();
+    globalData.prevMs = ms;
+    setTimeout(onEnterFrame, 1);
+}
+function init()
+{
+    var canvas = document.createElement("canvas");
+    canvas.setAttribute('width', CANVAS_W);
+    canvas.setAttribute('height', CANVAS_H);
+    canvas.setAttribute('id', FRACTAL_CANVAS);
+    document.body.appendChild(canvas);
+    
+    if(canvas.getContext) 
+    {
+        var ctx = canvas.getContext('2d');
+        var imageData = ctx.createImageData(CANVAS_W, CANVAS_H);
+        var pixelArr = imageData.data;
+        var pixelCount = pixelArr.length / 4;
+        var id = 0;
+        for(var i=0; i<pixelCount;++i)
+        {
+            id = i*4;
+            
+            pixelArr[id+0] = 0;
+            pixelArr[id+1] = 0;
+            pixelArr[id+2] = 0;
+            pixelArr[id+3] = 255;
+        }
+        ctx.putImageData(imageData, 0, 0);
+        globalData.prevX = CANVAS_W;
+        globalData.prevY = CANVAS_H;
+    }
+    
+    var ta = document.createElement("textarea");
+    ta.setAttribute('cols', 40);
+    ta.setAttribute('rows', 30);
+    ta.setAttribute('id', 'TA');
+    document.body.appendChild(ta);
+    ta.value = "init()";
+    
+    globalData.nextUpdate = 0;
+    globalData.prevMs = new Date().getTime();
+    
+    setTimeout(onEnterFrame, 1);
+}
+function getPixelIDFromCoord(x,y)
+{
+    if(x < 0 || x > CANVAS_W 
+    || y < 0 || y > CANVAS_H)
+    {
+        return -1;
+    }
+    
+    return ( (Math.floor(y) * CANVAS_W) + Math.floor(x) )*4;
+}
+function drawFractal()
+{
+    //localTrace("drawFractal "+globalData.prevMs);
+    var canvas = document.getElementById(FRACTAL_CANVAS);
+    if(canvas.getContext) 
+    {
+        var ctx = canvas.getContext('2d');
+        var imageData = ctx.getImageData(0,0, CANVAS_W, CANVAS_H);
+        var pixelArr = imageData.data;
+        var pixelCount = pixelArr.length / 4;
+//        localTrace("pixelCount "+pixelCount, true);
+        var formulaArr = 
+        [
+/*        
+        0.3333,   0.0000,   0.0000,   0.0000,   0.3333,   0.0000,
+        0.1667,  -0.2887,   0.3333,   0.2887,   0.1667,   0.0000,   
+        0.1667,   0.2887,   0.5000,  -0.2887,   0.1667,   0.2887,   
+        0.3333,   0.0000,   0.6667,   0.0000,   0.3333,   0.0000 
+        */
+        0.5, 0, 0,      0, 0.5,   0,
+        0.5, 0, 0.50,   0, 0.5,   0,
+        0.5, 0, 0.25,   0, 0.5,   0.433
+        ];
+/*      a, b, e,        c, d, f
+        f(x,y) =  ( ax + by + e,
+                    cx + dy + f )
+*/
+        var formulaColourArr = 
+        [
+        255, 0, 0,
+        0, 255, 0,
+        0, 0, 255,
+        200, 200, 0
+        ];
+        
+        var oldX = globalData.prevX;
+        var oldY = globalData.prevY;
+        var x = globalData.prevX;
+        var y = globalData.prevY;
+        var pxID = -1;
+        var formulaID = 0;
+        var formulaCount = (formulaArr.length+1) / 6 - 1;
+        // TODO: add weighting
+        for(var i=0; i<PX_PER_FRAME;++i)
+        {
+            formulaID = Math.round(Math.random()*formulaCount);
+//            localTrace("formulaID "+formulaID, true);
+//        localTrace("oldX "+oldX+" oldY "+oldY, true);
+            x =   formulaArr[formulaID*6 + 0] * oldX 
+                + formulaArr[formulaID*6 + 1] * oldY
+                + formulaArr[formulaID*6 + 2] * CANVAS_W;
+
+            y =   formulaArr[formulaID*6 + 3] * oldX 
+                + formulaArr[formulaID*6 + 4] * oldY
+                + formulaArr[formulaID*6 + 5] * CANVAS_H;
+
+            pxID = getPixelIDFromCoord(x,y);
+//            localTrace("pxID "+pxID, true);
+            
+            oldX = Math.floor(x);
+            oldY = Math.floor(y);
+            
+//        localTrace("x "+x+" y "+y, true);
+            if(pxID == -1)
+            {
+                // out of bounds, try again with new x and y
+//                --i;
+localTrace("out of bounds "+x+" "+y, true);
+                continue;
+            }
+            pixelArr[pxID+0] = formulaColourArr[formulaID*3+0];
+            pixelArr[pxID+1] = formulaColourArr[formulaID*3+1];
+            pixelArr[pxID+2] = formulaColourArr[formulaID*3+2];
+            
+            
+//            pixelArr[pxID+0] = 255;
+//            pixelArr[pxID+1] = 255;
+//            pixelArr[pxID+2] = 255;
+            pixelArr[pxID+3] = 255;
+            
+//            ++formulaID;
+//            if(formulaID > formulaArr.length / 6 - 1)
+            {
+//                formulaID = 0;
+            }
+        }
+        globalData.prevX = oldX;
+        globalData.prevY = oldY;
+//        localTrace("prevX "+globalData.prevX+"prevY "+globalData.prevY, true);
+        ctx.putImageData(imageData, 0, 0);
+    }
+}
+</script>
+</head>
+<body>
+<script type="text/javascript"> init() </script>
+</body>
+</html>
