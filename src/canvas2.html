@@ -1,0 +1,102 @@
+<html>
+<body>
+<canvas id="myCanvas" width="800" height="600">your browser does not support the canvas tag </canvas>
+<textarea id="myTA" rows="20" cols="20"></textarea>
+
+<script type="text/javascript">
+var MAXPX = 50;
+var MINPX = 12;
+var canvas=document.getElementById('myCanvas');
+var myTA=document.getElementById('myTA');
+var ctx=canvas.getContext('2d');
+var isMDown = false;
+
+//=========================================================================
+function localTrace(text)
+{
+    myTA.value += text + "\n";
+}
+function supports_html5_storage() 
+{
+    try 
+    {
+        return 'localStorage' in window && window['localStorage'] !== null;
+    } 
+    catch (e) 
+    {
+        return false;
+    }
+}
+function OnMouseDown(e) 
+{
+    localTrace("Mouse down:"+e.x+","+e.y);
+    isMDown = true;
+}
+function OnMouseUp(e) 
+{
+    localTrace("Mouse up:"+e.x+","+e.y);
+    isMDown = false;
+}
+function OnMouseMove(e) 
+{
+    if(isMDown)
+    {
+        OnMouseDrag(e);
+    }
+}
+function OnMouseDrag(e) 
+{
+    localTrace("Mouse drag:"+e.x+","+e.y);
+}
+function init()
+{
+    if(supports_html5_storage())
+    {
+        localTrace("Has local storage");
+    }
+    else 
+    {
+        localTrace("No local storage");
+    }
+    
+    canvas.addEventListener("mousedown", OnMouseDown, false);
+    canvas.addEventListener("mouseup", OnMouseUp, false);
+    canvas.addEventListener("mousemove", OnMouseMove, false);
+}
+function saveGameState() {
+localTrace("saveGameState");
+    if (!supports_html5_storage()) { return false; }
+    localStorage["canvas2.test"] = "some test text";
+    return true;
+}
+function loadGameState() {
+localTrace("loadGameState");
+    if (!supports_html5_storage()) { return false; }
+    localTrace("local storage data: "+localStorage["canvas2.test"]);
+    return true;
+}
+//=========================================================================
+
+init();
+//saveGameState();
+loadGameState();
+var t = "Hello me";
+//ctx.font = "bold 12px san-serif";
+ctx.strokeStyle='#FF0000';
+ctx.textBaseline = "top";
+var offset = 0;
+//ctx.fillText("Testing", 0, 0);
+/*for(var i = 0; i < 10; ++i)
+{
+    var fontSize = (MINPX+10*i);
+    ctx.font = "bold "+fontSize+"px san-serif";
+	var outText = "text: "+fontSize+" offset:"+offset;
+    ctx.fillText(outText, 0, offset);
+    var textMet = ctx.measureText(outText);
+
+    ctx.strokeRect(0,offset,textMet.width,fontSize);
+    offset += fontSize;
+}*/
+</script>
+</body>
+</html>
