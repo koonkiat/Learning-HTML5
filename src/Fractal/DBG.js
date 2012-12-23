@@ -1,25 +1,25 @@
 var DBG = 
 {
     ta      : null,
-    init    : function(document)
+    init    : function(document, rows, cols)
     {
         this.ta = document.createElement("textarea");
-        this.ta.setAttribute('cols', 40);
-        this.ta.setAttribute('rows', 30);
+        this.ta.setAttribute('cols', cols);
+        this.ta.setAttribute('rows', rows);
         this.ta.setAttribute('id', 'TA');
         document.body.appendChild(this.ta);
         this.ta.value = "DBG init()";
     },
     
-    trace: function(text, isAppend)
+    trace: function(text, isClear)
     {
-        if(isAppend)
+        if(isClear)
         {
-            this.ta.value += "\n"+text;
+            this.ta.value = text;
         }
         else
         {
-            this.ta.value = text;
+            this.ta.value += "\n"+text;
         }
     },
 }
